@@ -17,9 +17,9 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
         var cliente = await context.Clientes.FirstOrDefaultAsync(x => x.Id == request.ClienteId);
         if (cliente is null)
             return new Response<Orcamento?>(null, 404, message: "Cliente não encontrado");
-        
+
         var veiculo = await context.Veiculos.FirstOrDefaultAsync(x => x.Id == request.VeiculoId);
-        if(veiculo is null)
+        if (veiculo is null)
             return new Response<Orcamento?>(null, 404, message: "Veículo não encontrado");
 
         var orcamento = new Orcamento()
@@ -28,7 +28,7 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
             Veiculo = veiculo,
             Status = request.Status
         };
-        
+
         try
         {
             await context.Orcamentos.AddAsync(orcamento);
@@ -54,23 +54,23 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
             var cliente = await context.Clientes.FirstOrDefaultAsync(x => x.Id == request.ClienteId);
             if (cliente is null)
                 return new Response<Orcamento?>(null, 404, message: "Cliente não encontrado");
-        
+
             var veiculo = await context.Veiculos.FirstOrDefaultAsync(x => x.Id == request.VeiculoId);
-            if(veiculo is null)
+            if (veiculo is null)
                 return new Response<Orcamento?>(null, 404, message: "Veículo não encontrado");
-        
+
             var orcamento = await context.Orcamentos
                 .Include(x => x.Cliente)
                 .Include(x => x.Veiculo)
                 .FirstOrDefaultAsync(x => x.Id == request.Id);
             if (orcamento is null)
                 return new Response<Orcamento?>(null, 404, message: "Orçamento não encontrado");
-        
+
             orcamento.Cliente = cliente;
             orcamento.Veiculo = veiculo;
             orcamento.Status = request.Status;
             orcamento.UpdatedAt = DateTime.UtcNow;
-            
+
             context.Orcamentos.Update(orcamento);
             await context.SaveChangesAsync();
 
@@ -93,7 +93,7 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
             var orcamento = await context.Orcamentos.FirstOrDefaultAsync(x => x.Id == request.Id);
             if (orcamento is null)
                 return new Response<Orcamento?>(null, 404, message: "Orçamento não encontrado");
-            
+
             context.Orcamentos.Remove(orcamento);
             await context.SaveChangesAsync();
 
@@ -103,7 +103,7 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
         {
             return new Response<Orcamento?>(null, 500, message: "Não foi possível exlcuir o orçamento");
         }
-        catch (Exception )
+        catch (Exception)
         {
             return new Response<Orcamento?>(null, 500, message: "Falha interna no servidor");
         }
@@ -118,6 +118,7 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
                 .Include(x => x.Veiculo)
                 .Include(x => x.OrcamentoProdutos)
                 .ThenInclude(x => x.Produto)
+                .Include(x => x.ProdutoAvulsos)
                 .FirstOrDefaultAsync(x => x.Id == request.Id);
 
             var orcamentoViewModel = orcamento is null
@@ -152,11 +153,21 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
                         Quantidade = x.Quantidade,
                         ValorVenda = x.ValorVenda
                     }).ToList(),
+                    ProdutosAvulsos = orcamento.ProdutoAvulsos.Select(x => new ProdutoAvulsoViewModel()
+                    {
+                        Id = x.Id,
+                        Sku = x.Sku,
+                        Nome = x.Nome,
+                        Fabricante = x.Fabricante,
+                        ValorVenda = x.ValorVenda,
+                        CreatedAt = x.CreatedAt,
+                        UpdatedAt = x.UpdatedAt
+                    }).ToList(),
                     Status = orcamento.Status,
                     CreatedAt = orcamento.CreatedAt,
                     UpdatedAt = orcamento.UpdatedAt
                 };
-            
+
             return orcamento is null
                 ? new Response<OrcamentoViewModel?>(null, 404, message: "Orçamento não encontrado")
                 : new Response<OrcamentoViewModel?>(orcamentoViewModel);
@@ -165,7 +176,7 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
         {
             return new Response<OrcamentoViewModel?>(null, 500, message: "Não foi possível buscar o orçamento");
         }
-        catch (Exception )
+        catch (Exception)
         {
             return new Response<OrcamentoViewModel?>(null, 500, message: "Falha interna no servidor");
         }
@@ -176,11 +187,11 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
         try
         {
             var query = context.Orcamentos.AsNoTracking();
-            
+
             var orcamentos = await query
                 .Include(x => x.Cliente)
                 .Include(x => x.Veiculo)
-                .Skip((request.PageNumber -1) * request.PageSize)
+                .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ToListAsync();
 
@@ -208,9 +219,9 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
                 CreatedAt = x.CreatedAt,
                 UpdatedAt = x.UpdatedAt
             });
-            
-            
-            
+
+
+
             var count = await query.CountAsync();
 
             return new PagedResponse<IEnumerable<OrcamentoViewModel>?>(
@@ -224,7 +235,7 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
         {
             return new PagedResponse<IEnumerable<OrcamentoViewModel>?>(null, 500, message: "Não foi possível buscar os orçamentos");
         }
-        catch (Exception )
+        catch (Exception)
         {
             return new PagedResponse<IEnumerable<OrcamentoViewModel>?>(null, 500, message: "Falha interna no servidor");
         }
@@ -251,8 +262,8 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
                 Quantidade = request.Quantidade,
                 ValorVenda = request.ValorVenda
             };
-            
-            
+
+
             orcamento.OrcamentoProdutos.Add(item);
             context.Orcamentos.Update(orcamento);
             await context.SaveChangesAsync();
@@ -263,7 +274,7 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
         {
             return new Response<Orcamento?>(null, 500, message: "Não foi possível incluir o produto no orçamento");
         }
-        catch (Exception )
+        catch (Exception)
         {
             return new Response<Orcamento?>(null, 500, message: "Falha interna no servidor");
         }
@@ -276,28 +287,28 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
             var orcamento = await context.Orcamentos
                 .Include(x => x.OrcamentoProdutos)
                 .FirstOrDefaultAsync(x => x.Id == request.OrcamentoId);
-            
+
             if (orcamento is null)
                 return new Response<Orcamento?>(null, 404, message: "Orçamento não encontrado");
-        
+
             var item = orcamento.OrcamentoProdutos.FirstOrDefault(x => x.Id == request.Id);
             if (item is null)
                 return new Response<Orcamento?>(null, 404, message: "Item não encontrado");
-            
+
             item.Quantidade = request.Quantidade;
             item.ValorVenda = request.ValorVenda;
-            
-            
+
+
             context.Orcamentos.Update(orcamento);
             await context.SaveChangesAsync();
-            
+
             return new Response<Orcamento?>(orcamento, message: "Item atualizado com sucesso");
         }
         catch (DbUpdateException)
         {
             return new Response<Orcamento?>(null, 500, message: "Não foi possível atualizar o produto no orçamento");
         }
-        catch (Exception )
+        catch (Exception)
         {
             return new Response<Orcamento?>(null, 500, message: "Falha interna no servidor");
         }
@@ -310,31 +321,139 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
             var orcamento = await context.Orcamentos
                 .Include(x => x.OrcamentoProdutos)
                 .FirstOrDefaultAsync(x => x.Id == request.OrcamentoId);
-            
+
             if (orcamento is null)
                 return new Response<Orcamento?>(null, 404, message: "Orçamento não encontrado");
-        
+
             var item = orcamento.OrcamentoProdutos.FirstOrDefault(x => x.Id == request.Id);
             if (item is null)
                 return new Response<Orcamento?>(null, 404, message: "Item não encontrado");
-            
+
             orcamento.OrcamentoProdutos.Remove(item);
-            
+
             context.Orcamentos.Update(orcamento);
             context.OrcamentoProdutos.Remove(item);
             await context.SaveChangesAsync();
-            
+
             return new Response<Orcamento?>(orcamento, message: "Item removido com sucesso");
         }
         catch (DbUpdateException)
         {
             return new Response<Orcamento?>(null, 500, message: "Não foi possível remover o produto do orçamento");
         }
-        catch (Exception )
+        catch (Exception)
         {
             return new Response<Orcamento?>(null, 500, message: "Falha interna no servidor");
-            
+
         }
-        
+
+    }
+
+    public async Task<Response<Orcamento?>> AdicionarProdutoAvulsoOrcamentoAsync(AdicionarProdutoAvulsoOrcamentoRequest request)
+    {
+        try
+        {
+            var orcamento = await context.Orcamentos
+                .Include(x => x.ProdutoAvulsos)
+                .FirstOrDefaultAsync(x => x.Id == request.OrcamentoId);
+
+            if (orcamento is null)
+                return new Response<Orcamento?>(null, 404, message: "Orçamento não encontrado");
+
+            var produto = new ProdutoAvulso()
+            {
+                Sku = request.Sku,
+                Nome = request.Nome,
+                Fabricante = request.Fabricante,
+                Quantidade = request.Quantidade,
+                ValorVenda = request.ValorVenda
+            };
+
+            orcamento.ProdutoAvulsos.Add(produto);
+            context.Orcamentos.Update(orcamento);
+            await context.SaveChangesAsync();
+
+            return new Response<Orcamento?>(orcamento, message: "Produto avulso adicionado ao orçamento com sucesso");
+        }
+        catch (DbUpdateException)
+        {
+            return new Response<Orcamento?>(null, 500, message: "Não foi possível adicionar o produto avulso no orçamento");
+        }
+        catch (Exception)
+        {
+            return new Response<Orcamento?>(null, 500, message: "Falha interna no servidor");
+        }
+    }
+
+    public async Task<Response<Orcamento?>> UpdateProdutoAvulsoOrcamentoAsync(UpdateProdutoAvulsoOrcamentoRequest request)
+    {
+        try
+        {
+            var orcamento = await context.Orcamentos
+                .Include(x => x.ProdutoAvulsos)
+                .FirstOrDefaultAsync(x => x.Id == request.OrcamentoId);
+
+            if (orcamento is null)
+                return new Response<Orcamento?>(null, 404, message: "Orçamento não encontrado");
+
+            var produto = orcamento.ProdutoAvulsos.FirstOrDefault(x => x.Id == request.Id);
+            if (produto is null)
+                return new Response<Orcamento?>(null, 404, message: "Produto não encontrado");
+
+            produto.Sku = request.Sku;
+            produto.Nome = request.Nome;
+            produto.Fabricante = request.Fabricante;
+            produto.Quantidade = request.Quantidade;
+            produto.ValorVenda = request.ValorVenda;
+            produto.UpdatedAt = DateTime.UtcNow;
+
+            context.Orcamentos.Update(orcamento);
+            await context.SaveChangesAsync();
+
+            return new Response<Orcamento?>(orcamento, message: "Produto avulso atualizado com sucesso");
+        }
+        catch (DbUpdateException)
+        {
+            return new Response<Orcamento?>(null, 500, message: "Não foi possível atualizar o produto avulso no orçamento");
+        }
+        catch (Exception)
+        {
+            return new Response<Orcamento?>(null, 500, message: "Falha interna no servidor");
+        }
+    }
+
+    public async Task<Response<Orcamento?>> RemoverProdutoAvulsoOrcamentoAsync(RemoverProdutoAvulsoOrcamentoRequest request)
+    {
+        try
+        {
+            var orcamento = await context.Orcamentos
+                .Include(x => x.ProdutoAvulsos)
+                .FirstOrDefaultAsync(x => x.Id == request.OrcamentoId);
+
+            if (orcamento is null)
+                return new Response<Orcamento?>(null, 404, message: "Orçamento não encontrado");
+
+            var produto = orcamento.ProdutoAvulsos.FirstOrDefault(x => x.Id == request.Id);
+            if (produto is null)
+                return new Response<Orcamento?>(null, 404, message: "Produto não encontrado");
+
+            orcamento.ProdutoAvulsos.Remove(produto);
+
+            context.Orcamentos.Update(orcamento);
+            context.ProdutosAvulsos.Remove(produto); 
+
+            await context.SaveChangesAsync();
+
+            return new Response<Orcamento?>(orcamento, message: "Produto avulso removido com sucesso");
+        }
+        catch (DbUpdateException)
+        {
+            return new Response<Orcamento?>(null, 500, message: "Não foi possível remover o produto avulso do orçamento");
+        }
+        catch (Exception)
+        {
+            return new Response<Orcamento?>(null, 500, message: "Falha interna no servidor");
+        }
+
     }
 }

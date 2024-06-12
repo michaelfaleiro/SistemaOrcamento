@@ -3,7 +3,7 @@ using SistemaOrcamento.Core.Models;
 
 namespace SistemaOrcamento.Core.Request.Orcamentos;
 
-public class AdicionarAnotacaoOrcamento
+public class AdicionarAnotacaoOrcamentoRequest
 {
     [Required (ErrorMessage = "O campo Anotacao é obrigatório")]
     public int OrcamentoId { get; set; }

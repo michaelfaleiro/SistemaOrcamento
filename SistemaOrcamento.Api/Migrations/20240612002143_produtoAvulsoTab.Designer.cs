@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SistemaOrcamento.Api.Data;
 
@@ -11,9 +12,11 @@ using SistemaOrcamento.Api.Data;
 namespace SistemaOrcamento.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240612002143_produtoAvulsoTab")]
+    partial class produtoAvulsoTab
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -216,9 +219,6 @@ namespace SistemaOrcamento.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("OrcamentoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantidade")
                         .HasColumnType("int");
 
                     b.Property<string>("Sku")

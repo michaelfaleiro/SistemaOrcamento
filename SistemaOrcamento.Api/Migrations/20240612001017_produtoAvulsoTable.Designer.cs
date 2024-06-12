@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SistemaOrcamento.Api.Data;
 
@@ -11,9 +12,11 @@ using SistemaOrcamento.Api.Data;
 namespace SistemaOrcamento.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240612001017_produtoAvulsoTable")]
+    partial class produtoAvulsoTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -207,10 +210,6 @@ namespace SistemaOrcamento.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Fabricante")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -218,11 +217,7 @@ namespace SistemaOrcamento.Api.Migrations
                     b.Property<int>("OrcamentoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Quantidade")
-                        .HasColumnType("int");
-
                     b.Property<string>("Sku")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -235,7 +230,7 @@ namespace SistemaOrcamento.Api.Migrations
 
                     b.HasIndex("OrcamentoId");
 
-                    b.ToTable("ProdutosAvulsos");
+                    b.ToTable("ProdutoAvulso");
                 });
 
             modelBuilder.Entity("SistemaOrcamento.Core.Models.Veiculo", b =>

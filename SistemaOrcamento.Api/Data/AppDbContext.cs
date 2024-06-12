@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using SistemaOrcamento.Api.Data.Mappings;
 using SistemaOrcamento.Core.Models;
 
 namespace SistemaOrcamento.Api.Data;
@@ -13,5 +12,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<OrcamentoProduto> OrcamentoProdutos { get; set; } = null!;
     public DbSet<Anotacao> Anotacoes { get; set; } = null!;
     public DbSet<Produto> Produtos { get; set; } = null!;
+    public DbSet<ProdutoAvulso> ProdutosAvulsos { get; set; } = null!;
     
 }

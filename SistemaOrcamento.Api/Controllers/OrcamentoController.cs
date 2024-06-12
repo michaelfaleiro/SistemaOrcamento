@@ -104,6 +104,34 @@ public class OrcamentoController(IOrcamentoHandler orcamentoHandler) : Controlle
             : BadRequest(response);
     }
     
+    [HttpPost("adicionar-produto-avulso")]
+    public async Task<IActionResult> AdicionarProdutoAvulso([FromBody] AdicionarProdutoAvulsoOrcamentoRequest request)
+    {
+        var response = await orcamentoHandler.AdicionarProdutoAvulsoOrcamentoAsync(request);
+
+        return response.IsSuccess
+            ? Ok(response)
+            : BadRequest(response);
+    }
     
+    [HttpPut("atualizar-produto-avulso")]
+    public async Task<IActionResult> AtualizarProdutoAvulso([FromBody] UpdateProdutoAvulsoOrcamentoRequest request)
+    {
+        var response = await orcamentoHandler.UpdateProdutoAvulsoOrcamentoAsync(request);
+
+        return response.IsSuccess
+            ? Ok(response)
+            : BadRequest(response);
+    }
+
+    [HttpDelete("remover-produto-avulso")]
+    public async Task<IActionResult> RemoverProdutoAvulso([FromBody] RemoverProdutoAvulsoOrcamentoRequest request)
+    {
+        var response = await orcamentoHandler.RemoverProdutoAvulsoOrcamentoAsync(request);
+
+        return response.IsSuccess
+            ? Ok(response)
+            : BadRequest(response);
+    }
 
 }

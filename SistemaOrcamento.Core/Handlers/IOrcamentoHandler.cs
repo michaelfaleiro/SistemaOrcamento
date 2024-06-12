@@ -15,4 +15,7 @@ public interface IOrcamentoHandler
     Task<Response<Orcamento?>> AdicionarProdutoOrcamentoAsync(AdicionarProdutoOrcamentoRequest request);
     Task<Response<Orcamento?>> UpdateProdutoOrcamentoAsync(UpdateProdutoOrcamentoRequest request);
     Task<Response<Orcamento?>> RemoverProdutoOrcamentoAsync(RemoverProdutoOrcamentoRequest request);
+    Task<Response<Orcamento?>> AdicionarProdutoAvulsoOrcamentoAsync(AdicionarProdutoAvulsoOrcamentoRequest request);
+    Task<Response<Orcamento?>> UpdateProdutoAvulsoOrcamentoAsync(UpdateProdutoAvulsoOrcamentoRequest request);
+    Task<Response<Orcamento?>> RemoverProdutoAvulsoOrcamentoAsync(RemoverProdutoAvulsoOrcamentoRequest request);
 }

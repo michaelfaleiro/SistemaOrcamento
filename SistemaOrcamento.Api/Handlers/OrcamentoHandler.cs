@@ -121,6 +121,10 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
                 .Include(x => x.ProdutoAvulsos)
                 .FirstOrDefaultAsync(x => x.Id == request.Id);
 
+            var total = orcamento.OrcamentoProdutos.Sum(item => item.Quantidade * item.ValorVenda) +
+                            orcamento.ProdutoAvulsos.Sum(produtoAvulso =>
+                                produtoAvulso.Quantidade * produtoAvulso.ValorVenda);
+            
             var orcamentoViewModel = orcamento is null
                 ? null
                 : new OrcamentoViewModel()
@@ -158,11 +162,13 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
                         Id = x.Id,
                         Sku = x.Sku,
                         Nome = x.Nome,
+                        Quantidade = x.Quantidade,
                         Fabricante = x.Fabricante,
                         ValorVenda = x.ValorVenda,
                         CreatedAt = x.CreatedAt,
                         UpdatedAt = x.UpdatedAt
                     }).ToList(),
+                    ValorTotal = total,
                     Status = orcamento.Status,
                     CreatedAt = orcamento.CreatedAt,
                     UpdatedAt = orcamento.UpdatedAt
@@ -440,7 +446,7 @@ public class OrcamentoHandler(AppDbContext context) : IOrcamentoHandler
             orcamento.ProdutoAvulsos.Remove(produto);
 
             context.Orcamentos.Update(orcamento);
-            context.ProdutosAvulsos.Remove(produto); 
+            context.ProdutosAvulsos.Remove(produto);
 
             await context.SaveChangesAsync();
 

@@ -11,6 +11,7 @@ public class OrcamentoViewModel
     public IEnumerable<ProdutoOrcamentoViewModel> ItensOrcamento { get; set; } = [];
     public IEnumerable<ProdutoAvulsoViewModel> ProdutosAvulsos { get; set; } = [];
     public string Status { get; set; }
+    public decimal ValorTotal { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

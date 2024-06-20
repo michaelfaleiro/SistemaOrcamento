@@ -17,6 +17,7 @@ builder.Services.AddTransient<IClienteHandler, ClienteHandler>();
 builder.Services.AddTransient<IVeiculoHandler, VeiculoHandler>();
 builder.Services.AddTransient<IProdutoHandler, ProdutoHandler>();
 builder.Services.AddTransient<IOrcamentoHandler, OrcamentoHandler>();
+builder.Services.AddTransient<ICotacaoHandler, CotacaoHandler>();
 
 builder.Services.AddScoped<ClienteHandler>();
 

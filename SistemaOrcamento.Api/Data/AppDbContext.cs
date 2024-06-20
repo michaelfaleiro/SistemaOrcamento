@@ -13,5 +13,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Anotacao> Anotacoes { get; set; } = null!;
     public DbSet<Produto> Produtos { get; set; } = null!;
     public DbSet<ProdutoAvulso> ProdutosAvulsos { get; set; } = null!;
+    public DbSet<Cotacao> Cotacoes { get; set; } = null!;
+    public DbSet<CotacaoProduto> CotacaoProdutos { get; set; } = null!;
+    public DbSet<CotacaoPrecoProduto> CotacaoPrecoProdutos { get; set; } = null!;
+    public DbSet<Fornecedor> Fornecedores { get; set; } = null!;
     
 }
